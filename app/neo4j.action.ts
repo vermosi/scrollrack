@@ -1,5 +1,4 @@
-"use server";
-
+"use server"
 import { driver } from "@/db"
 import { Neo4JUser } from "@/types";
 
@@ -30,3 +29,30 @@ export const getUsersWithNoConnection = async (id: string) => {
     const users = result.records.map((record) => record.get("ou").properties);
     return users as Neo4JUser[];
 }
+
+export const neo4jSwipe = async (id: string, swipe: string, userId: string) => {
+    const type = swipe === "left" ? "DISLIKE" : "LIKE";
+    await driver.executeQuery(
+        `MATCH (cu: User { applicationId: $id}), (ou: User { applicationId: $userId}) CREATE (cu)-[:${type}]->(ou)`,
+        {
+            id,
+            userId,
+        }
+    )
+
+    if (type === 'LIKE') {
+        const result = await driver.executeQuery(
+            `MATCH (cu: User { applicationId: $id}), (ou: User { applicationId: $userId}) WHERE (ou)-[:LIKE]->(cu) RETURN ou as match`,
+            {
+                id,
+                userId,
+            }
+        )
+        const matches = result.records.map(
+            (record) => record.get("match").properties
+        )
+        return Boolean(matches.length > 0)
+    }
+    
+}
+
