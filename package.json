@@ -20,7 +20,6 @@
     "react-dom": "^18",
     "react-tinder-card": "^1.6.4",
     "server-only": "^0.0.1",
-    "sqlite3": "^5.1.7",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7"
   },
